@@ -1,0 +1,561 @@
+micahscopes You should not need to run cmake again, that this happens hints that the library using dna_type_offsets.h isn't listing bf_dna
+as a dep. or this wouldn't have happened.
+19:36
+Well the weird thing is that
+add_dependencies(bf_blenkernel bf_dna)
+was already in CMakeLists.txt
+(Thanks for helping me understand this by the way)
+19:37
+That's odd then, as this means
+dna_type_offsets.h
+should be created. If there is a reproducable bug, it can be investigated.
+19:40
+Is it a typical workflow to just re-run
+ninja
+after switching branches?
+19:40
+this is big - technologyreview.com/2020/10/30/1011435/ai-fourier-neural-network-cracks-navier-stokes-and-partial-differential-equations/?fbclid=IwAR1O4eMPDRNiQMeQUxNbYVNxi5q5AOKIBy_bboFzn0xL3FiWyVf7kHdneRM
+instant fluid sim
+wp.technologyreview.com/wp-content/uploads/2020/10/ns_sr_v1e-4_labelled.gif
+19:41
+Oh wow! 1,000x faster it says...
+19:42
+and it can do all sorts of things too - I think fracture etc
+'unified sim' almost really
+19:45
+It sounds very general (they just used Navier Stokes as an example)
+21:52
+micahscopes usually deleting CMakeCache.txt sorts things out.
+micahscopes November 1, 2020 7:40 PM
+Is it a typical workflow to just re-run
+ninja
+after switching branches?
+23:16
+How do I go back in version ? the current one that I built is 2.91.0 , I want to go back to 2.90.0 (2020-08-31) , how do I do it ? , When I do
+git branch -a I get branches but by feature name , like remotes/origin/layers or remotes/origin/hair_guides
+,
+But nothing about versions ?
+23:30
+Soutrik You are looking for a
+tag not a branch 🙂 git tag to list all then tags and the check one out using git checkout <tag>
+🙂
+23:30
+I see , thank you
+00:23
+ideasman42 I've just seen your commit about the deprecation of of
+bpy.app.binary_path_python. I've checked and sys.executable returns None
+in my developer debug build, so currently this doesn't seem like we can replace it just yet.
+Release build seems to be fine.
+00:24
+Robert Gützkow
+bpy.app.binary_path_python is an alias to sys.executable
+now, are you sure about this?
+00:25
+Yes, in my build from 25 min. ago
+bpy.app.binary_path_python returns the path, but sys.executable returns None
+00:27
+Does blender print this on startup
+Unable to find the python binary, the multiprocessing module may not be functional!
+?
+00:27
+Oops, yes it does.
+00:28
+Then
+binary_path_python should be None too, try update again (check you have 276d19f63b4534545c2e1a9d5c48525298b1a445
+), fixed this recently
+00:29
+Yes I have, just pulled and build today
+00:30
+That doesn't make sense then, this just returns
+sys.executable
+.
+00:30
+I'll investigate later
+Gotta go for now.
+00:43
+iss Hey! From my understanding you did get the automated sequencer test in master. That's cool! I would suggest the following now:
+- Add animated transform test
+- Verify the media transform patch passes all tests
+- Commit the media transform patch
+- Profit
+00:44
+arc doesn't seem to accept connection today... tried on two of my computers, it always time out, any ideas?
+00:44
+Sergey Tests are in, but I think I screwed up - now LTS and few other tests are failing for some reason on buildbot. Not sure how to debug this
+00:45
+why would LTS care 😕
+LTS is failing due to BLI_path_test
+00:48
+Ah, I am just checking. But master is failing because of my test. Locally it's OK
+00:48
+testing sequencer test locally here
+00:49
+Good morning
+00:49
+I was thinking perhaps buildbot didn't checkout SVN?
+dr. Sybren Hi
+00:51
+iss no, files are there
+iss now, while it compiles. how about an educated guess?
+iss absolute paths?
+00:53
+that could be the case...
+00:53
+yeah.....
+source directory is
+C:/Blender-git/lib/tests/sequence_editing/transform/ should be //
+instead
+00:54
+Oops, will fix now
+00:54
+i think Shift-A is not defaulted to relative or something
+01:10
+
+ Exception 
+[cURL/28] (https://developer.blender.org/api/differential.querydiffs) <CURLE_OPERATION_TIMEDOUT> The request took too long to complete.
+
+can't arc diff...
+01:12
+ChengduLittleA I guess phab is slow
+You could try to download the raw diff instead and apply it manually
+01:13
+ChengduLittleA or you can just retry, this happens to me as well sometimes
+01:13
+Sebastian Parborg So you guys things works then? I had this error all day now 😕
+I'll try a proxy later.
+01:14
+I ran arc diff in the last hour
+01:34
+troubled only if we had intel's nvme sticks on koro eh 😉
+01:40
+PSA: For Linux/macOS developer.blender.org/D9386
+proposes to use has been committed -fmacro-prefix-map by default (aka, source relative __FILE__).
+It's optional, so devs can always disable it: WITH_COMPILER_SHORT_FILE_MACRO
+02:00
+Hello everyone, meeting time
+02:00
+Room topic changed to: Meeting by dfelinto
+02:00
+Announcements:
+* User Interface meeting notes
+* Nicholas Rishel is now a committer, currently working on improved Windows tablet support. Welcome!
+02:01
+dfelinto what's Nicholas' username here?
+02:01
+and of course, the Together Apart blender conference last Friday
+dr. Sybren hm dont recall
+02:02
+dfelinto ok, maybe a discussion about recognisability of people is nice to have at some point 😉
+
+    👆 1 
+
+02:02
+Nicholas is PrototypeNM1 here
+and nicholas_rishel on developer.blender.org
+02:03
+other announcements: 2.91 bug spring this week
+Friday is code quality day (the 10th edition!)
+I wonder if Sergey is cooking anaything special for this anniversary
+anyone else otherwise 2.91 noq
+02:04
+Room topic changed to: Meeting 2) 2.91 by dfelinto
+02:04
+I dont really have anything for 2.91
+but if any dev think will need extra help to polish one of the features tell head of time
+anyways, let s use our time smartly
+
+    🤯 1 
+
+02:05
+Room topic changed to: Meeting 2) 2.92 by dfelinto
+02:05
+2.92!
+02:05
+Morning, guys
+02:06
+anyone to bring anything to 2.92?
+ah announcement
+02:07
+ideasman42 You're right,
+bpy.app.binary_path_python and sys.excutable
+output the same.
+02:07
+Robert Gützkow joins the triaging team
+02:07
+\o/
+02:07
+🥳
+
+    👍 6 
+
+02:07
+Robert Gützkow meeting time 🙂
+he will be working part time
+02:07
+dfelinto another announcement: Bassam Kurdali and ChristophLendenfeld are now officially part of the A&R module 🙂
+02:07
+freeing iss to work a week in tracker and a full week in VSE 🙂
+
+    👍 1 
+
+02:08
+Room topic changed to: Meeting 3) Others by dfelinto
+02:08
+any other topics anyone?
+dr. Sybren nice 🙂
+otherwise closing this lovely gathering now
+as like last week, if you follow the meeting in realtime thumbs up here
+
+    👍 7 👍 3 
+
+If you read it afterards and appreciated it - as oppose to just read the online log, thumbs up here
+
+    👍 3 
+
+02:10
+Room topic changed to: [2.92 bcon1](https://developer.blender.org/project/view/119/) | [2.91 bcon3](https://developer.blender.org/project/view/117/) | Next developer meeting November 9, 18:00 CET (17:00 UTC) | [Building Blender](https://wiki.blender.org/wiki/Building_Blender) | Please use the [#python](https://blender.chat/channel/python) channel for python based questions. by dfelinto
+02:11
+(this is so I can measure how relevant is to continue with the meeting this way, in this monologue format)
+(also to see if it is still worth to have alternate meeting times, instead of a single one)
+02:13
+dfelinto Brecht What's your opinion on recognisability of people? Personally I notice that I'm getting a bit annoyed by having to know who has what name on which system. Mostly because my memory isn't that good, so it's mostly annoyance with myself. From an outsider's point of view, it's also nice to be able to recognise people and know they're the same ones in various Blender-communication-platforms.
+Note that I'm not arguing for forcing people to use their real name. Just a consistent name everywhere, in all the communications.
+
+    👍 5 👍 1 
+
+02:17
+Room topic changed to: [Bug Sprint Week](https://code.blender.org/2020/07/bug-sprints/) | [2.92 bcon1](https://developer.blender.org/project/view/119/) | [2.91 bcon3](https://developer.blender.org/project/view/117/) | Next developer meeting November 9, 18:00 CET (17:00 UTC) | [Building Blender](https://wiki.blender.org/wiki/Building_Blender) | Please use the [#python](https://blender.chat/channel/python) channel for python based questions. by dfelinto
+02:18
+dr. Sybren I have something to say about that, but need to finish meeting notes first
+
+    👍 1 
+
+02:18
+there's two parts to this. one is we need an official webpage with list of contributors
+
+    👍 2 
+
+and the other is we could have some recommendations on naming
+
+    👍 1 
+
+02:22
+
+    we could have some recommendations on naming
+
+Brecht I can write a proposal on devtalk?
+02:29
+dr. Sybren there is also the topic of using blender id badges on phabricator
+dr. Sybren all in all I think people should use real names in the official blender channels + official filliations
+(whether that means to show that someone is a blender developer with commit access, or to show that someone is from e.g., ubisoft, nvidia, ..)
+it has to be done well so it not used to favour one report over the other for instance
+but knowing who we are talking to goes a long way
+dr. Sybren Ton had some ideas/requirements for that. you may want to check with him
+I was personally waiting for James (new devops/operations) to arrive, and after CI, to revisit this topic
+dr. Sybren meanwhile what I did was to use my wiki as my ID hub: wiki.blender.org/wiki/User:Dfelinto (inspired by jesterKing 's ideas on that)
+02:35
+And in the mean time the Modules wiki page is pointing to people's projects on dev.b.o instead
+dfelinto 02:34
+@dr.sybren meanwhile what I did was to use my wiki as my ID hub: wiki.blender.org/wiki/User:Dfelinto (inspired by @jesterKing 's ideas on that)
+02:36
+dr. Sybren not mine
+02:36
+ok, maybe it was done for just those without wiki page
+1 reply November 2, 2020 7:00 AM
+02:36
+Sergey I found issue with transform patch when using proxies, so I will fix that first.
+But yesterday I was using
+arc land
+to commit and I noticed it doesn't use my git credentials, do I need to configure this somehow?
+02:48
+pablovazquez (cc ideasman42 Hans Goudey ) check the great new artworks Daniel Bystedt added to wiki.blender.org/wiki/Reference/Release_Notes/2.91/Modeling
+
+    👍 1 🤩 1 
+
+and I just moved the add object tool to 2.92 release page
+02:51
+I'd like to come to some resolution for developer.blender.org/T81452
+I think people with strong opinions on the matter have commented (including myself), AFAICS we agree to disagree on some of the issues which happens at times. Nevertheless, some way to move on is needed.
+02:54
+dfelinto Sebastian Parborg Just wondering, should .mkv videos be used in the Wiki? I am not able to play them in my browser
+
+    👍 1 
+
+e.g. the chain video from wiki.blender.org/wiki/Reference/Release_Notes/2.91/Physics
+02:55
+iss
+arc land
+got broken with some of the tweaks. Or, maybe it is expected new behavior actually. Brecht should know better, AFAIR that tweak came from him
+02:57
+I may be using quite old version as well though...
+03:00
+sebbas I can play them in both firefox and chrome
+03:00
+Safari is a bit bad
+doesn't support webm either..
+03:02
+If someone will give fresh feedback
+Camera projection mapping for brush texture" developer.blender.org/T81662 me and ivpe ready to work on this and make it available in 2.92 😉
+dfelinto 02:06
+anyone to bring anything to 2.92?
+03:02
+Sebastian Parborg But I am on firefox too 🙂
+
+    😯 1 
+
+03:03
+Firefox 81.0.2 can play the videos fine. See extensions maybe ?
+I was seeing the videos on the wrong page
+sebbas bugzilla.mozilla.org/show_bug.cgi?id=1422891
+
+    👍 1 
+
+03:08
+Brecht question about 7 years old code, so I can imagine you don't remember 😉
+In
+solve_parenting() (object.c), there are two very similarly-named variables, float totmat[4][4]; and float tmat[4][4];
+. Do you have any idea what they are?
+03:10
+sebbas then I guess it is a mac issue 😉
+03:10
+Bastien is there a good reason thumbnails are always written LARGE? (even when regular Thumbnails are displayed).
+(made a small patch to change this, but you might know off hand why it's this way - D9412)
+03:11
+Sebastian Parborg in the end it's our issue ...
+03:11
+sebbas or hmm, saw the firefox report, I guess it is because I compile firefox myself 😛
+So I guess there is some fixes in gentoo that makes it work
+Anyways, I can easily reencode it to mp4
+03:12
+right, you compile everything 🙂
+03:13
+(Or just copy it to a new container in this case)
+
+    👍 1 
+
+03:13
+dr. Sybren I don't know the reason for those names, but isn't it clear from how they are computed?
+totmat is the parent's object matrix, tmat is totmat * parent inverse matrix
+Sergey iss maybe something needs to be fixed for arc land. the intent was to use the developer.blender.org username if no email address is there
+03:17
+Brecht The problem is that something is going wrong. This means I can't safely assume the semantics of the variables from the implementation, because the implementation might be wrong.
+03:17
+Brecht I have email defined in phabricator, Will look into this later.
+03:19
+ideasman42 not sure what you mean? how would you know in advance what size of thumbnails people want to display?
+03:19
+Currently the file selector has a zoom level you can use to display thumbnails
+the thumbnail cache can generate normal or large thumbnails.
+So. we could not generate large thumbnails if the user doesn't have the view set to large.
+03:21
+yes... but then you need to re-generate those thumbnails if user switch to large preview...
+03:21
+right
+Another patch proposed to make all Blender thumbnails 256x256 internally, because they're scaled up to 256 anyway, which made me wonder why they are scaled up when I wasn't viewing them at that size, and we support non-large thumbnails.
+03:22
+because it's cheaper/simpler to just generate and store one size?
+03:22
+(other patch developer.blender.org/D9404 )
+03:22
+like, is there a real reason not to do so?
+03:23
+4x the size, precious hard disk space? ... I don't have a strong opinion on this though. It just struck me as strange.
+Code comments could explain why large thumbnails are always used no matter what.
+03:24
+256x256 remains ridiculous in term of disk space given modern disks, come one
+03:25
+Yep, it's fine, but nice if comments explain that... since reading code it's not clear why we would multi-sized thumbs but not use it.
+03:25
+Well, was kinda obvious for me, but sure, can add a comment
+03:26
+I thought this might have been the reason, but it wasn't
+obvious
+03:28
+Talking about non-obvious things... where does
+BKE_object_where_is_calc_ex()
+store its result?
+I'm guessing
+ob->obmat
+, but it doesn't seem to be written down anywhere.
+03:31
+dr. Sybren
+BKE_object_to_mat4(ob, ob->obmat)
+?
+and then constraints also affect that value
+(and rigid bodies)
+03:31
+Sergey I had to look for
+SpaceSeq
+to fix versioning with proxies. If you want to check this change, here is paste P1746. Otherwise I can commit
+03:32
+dr. Sybren or are you complaining about our usual lack of code doc/comments? 😉
+03:32
+Bastien I am, especially since there actually is a return parameter that can hold a matrix.
+03:33
+dr. Sybren well, now you know what to do today 😛
+03:33
+Bastien yeah, fix a bug in the parenting code, between all the
+tmat, totmat
+, and functions that don't say what they do.
+Not to mention the
+locmat that doesn't just store the loc
+03:34
+dr. Sybren so now it's "learn and document functions, then fix the bug"
+locmat == local_matrix
+, welcome to old bad naming habits ...
+03:34
+it's horrible
+03:34
+just go fix it!
+03:35
+loc = location, mat == material, locmat == location_of_material
+, everybody knows that.
+
+    😁 3 
+
+03:36
+Oh, I thought the code was handling rugs/floor mats 😉
+03:45
+True 🙂
+ssh4 03:02
+If someone will give fresh feedback
+Camera projection mapping for brush texture" developer.blender.org/T81662 me and @ivpe ready to work on this and make it available in 2.92 😉
+dfelinto 02:06
+anyone to bring anything to 2.92?
+03:49
+I normally use transpose/translate matrix as matrix isn't used for storing locations 🙂
+03:57
+Jeroen Bakker yeah, it would be so good if "location/orientation" and "translation/rotation" weren't mixed up all the time.
+03:59
+to_be_scaled_matrix = translate_m4(...)
+03:59
+Right now I have only upto 2.90.1 , one bug ( developer.blender.org/T81948 ) needs the version 2.91.0 . I have tried
+git fetch origin and then tried git tag but still I get only upto 2.90.1
+04:00
+Soutrik blender 2.91 isn't tagged yet. They get tag when finally released. I recommend using
+git checkout blender-v2.91-release
+branch as base
+04:03
+I see , thanks
+04:16
+🙂
+04:54
+dfelinto Daniel Bystedt Wow, the curve release note images look awesome, thanks so much for making that!
+
+    😍 1 
+
+05:25
+Germano Do you think that clamping to zero for the fbx import would be a viable workaround or would you handle this differently?
+05:26
+iss not immediatelly clear why proxies need special handling. is it because ImBuf's dimensions are used for do-versions?
+05:27
+Sergey yes, it uses imBuf dimensions.
+05:27
+HI guys, I'm trying to build "geometry-nodes" branch and I'm getting "use of designated initializers requires at least '/std:c++latest'" error, can you give a hand how to fix it?
+C:\blender-git\blender\source\blender\modifiers\intern\MOD_nodes.cc(520,42): error C7555: use of designated initializers requires at least '/std:c++latest' [C:\blender-git\build_windows_x64_vc16_Release\source\blender\modifiers\bf_modifiers.vcxproj]
+C:\blender-git\blender\source\blender\nodes\geometry\nodes\node_geo_boolean.cc(56,53): error C7555: use of designated initializers requires at least '/std:c++latest' [C:\blender-git\build_windows_x64_vc16_Release\source\blender\nodes\bf_nodes.vcxproj]
+05:29
+happens in branches, gcc allows it even though it is not in the standard, msvc doens't, so devs sometimes mistakenly use it
+05:29
+Robert Gützkow, probably. But the ideal would be to find out why some exporters set negative values for shininess.
+(btw, Bastien who maintains that exporter).
+05:30
+happens in branches, gcc allows it even though it is not in the standard, msvc doens&amp;amp;amp;amp;#39;t, so devs sometimes mistakenly use it
+LazyDodo 05:29
+happens in branches, gcc allows it even though it is not in the standard, msvc doens't, so devs sometimes mistakenly use it
+November 2, 2020 5:34 AM
+05:31
+Miro Horvath That may be my fault. If you give me some time I can look into it
+05:31
+The last time I asked Bastien about strange output from fbx exporters, he was equally surprised by the nonsense they produced. Since there is not public specification, it's a bit difficult to check what should or shouldn't work.
+05:32
+just use gltf...
+05:33
+Bastien It's about a bug report though. Can't really tell our users to just switch to a different format? developer.blender.org/T75169
+05:35
+Robert Gützkow just close as invalid, unless someone can prove us this is a valid value in FBX specs - which I doubt to ever see demonstrated...
+05:39
+Hans Goudey sure, no problem
+05:39
+Bastien Done.
+05:44
+
+    ok thanks then,.. I'm new to building Blender so words like GCC doesn't ring a bell in the instant moment ... 
+
+Miro Horvath In that case, welcome 🙂
+GCC is the compiler suite we use for Linux. It's nice, but unfortunately it doesn't have a "only accept that subset of the language that's accepted by other compilers as well" setting.
+
+    👍 1 
+
+06:00
+Hans Goudey Hi, do you remember the problem with the Strength brush icon? we have again the same issue
+06:00
+Clipboard - 2 de noviembre de 2020 15:00
+06:01
+Hans Goudey Left is 2.83, right 2.92
+the icon missed alpha
+06:01
+Ton While looking for the root cause of a bug Bassam Kurdali found, I went all the way back to the very first commit.
+The context: when parenting an object, the parent-inverse matrix is computed to make it possible to parent without moving the object.
+The problem: that computation also includes the effect of constraints. This means that the rotation of a Copy Rotation constraint now acts as the rotation of a parent. This causes the child object's local translation to be rotated as well.
+Do you have any idea why it was done this way? Why the effects of constraints are also applied when computing the parent-inverse matrix?
+06:08
+Antonioya Hmm, thanks, I'll look into it
+06:12
+Hans Goudey np, and thanks to give you work?? 😉
+06:13
+iss is probably fine then. can't spot anything obviously bad/wrong in your patch.
+but i'm a bit pre-occupied with other task, so commit with care 😉 (not sure it is aimed for commit today?)
+06:14
+Sergey Ok, I would like to commit today, unless you want more time to review
+06:47
+iss The test
+sequencer_render_transform
+is failing on my machine. Could this have anything to do with local build options?
+06:52
+dr. Sybren Originally I had absolute paths in test files but I fixed them. So make sure you have latest files
+06:53
+iss the report HTML is really weird. It shows stripes instead of images, unless I hover my mouse over them, then they do show images.
+06:53
+Clipboard - November 2, 2020 3:53 PM
+06:53
+I don't know if that's caused by absolute paths.
+I'll
+svn up
+and re-test
+06:54
+my fix was rBL62509
+But it's strange I don't see ref images?
+06:55
+I just did a
+make update
+, rebuilding & re-running the test now
+there we go, now they succeed, thanks!
+I was just doing some things with parenting & transforms, so I wanted to be sure this wasn't caused by me
+"
+ok, maybe it was done for just those without wiki page
+"
+Yes, when I added those links I checked each person and tried pointing to the most appropriate place.
+07:22
+PhilippOeser please be more strict in which bug reports get confirmed. developer.blender.org/T82309 has an example file with multiple windows, lots of animation data & NLA strips that may or may not be relevant, and I think it can be stripped down way further than it is now.
+2 replies November 2, 2020 8:14 AM
+07:46
+Antonioya I guess when I fixed that last time I forgot to push the icons file. Then recently it was updated with other icons and my change got lost
+07:47
+Hans Goudey yes, it looked something like that
+07:48
+Antonioya Look okay?
+07:48
+Clipboard - November 2, 2020 9:48 AM
+07:48
+yes
+07:48
+Great, will push
+08:12
+For great justice! Push every commit!
+08:14
+Yes! Issue is the icons are also stored in an svn repo, it's easy to think you're done and forget to commit that one
+
+    08:19
+    😮
+
